@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, ReactNode } from "react";
+import supabase from "../supabase";
 
 type UserRole = "encontrista" | "admin" | null;
 
