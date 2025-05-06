@@ -16,38 +16,21 @@ export default function LoginForm() {
   const { toast } = useToast();
 
   const validateUsername = (value: string) => {
-    // Verificar se começa com @
-    if (!value.startsWith("@")) {
-      return "O usuário deve seguir o formato: @casade<casa>.nome.sobrenome";
+    const casaRegex = /^([a-zA-Z]{3,})\.([a-zA-Z]{3,})@([a-zA-Z]{3,})\.com$/g;
+    if (!casaRegex.test(value)) {
+      return "O usuário deve seguir o formato: nome.sobrenome@casa.com.";
     }
 
-    // Verificar se começa com @casade
-    if (!value.startsWith("@casade")) {
-      return "O usuário deve começar com @casade";
-    }
-
-    // Verificar se é um admin (@casadeoikos)
-    if (value.startsWith("@casadeoikos")) {
-      // Verificar se tem pelo menos dois pontos para administrador
-      const dots = value.split(".").length - 1;
-      if (dots < 2) {
-        return "O usuário de administrador deve conter pelo menos dois pontos (ex: @casadeoikos.admin.nome)";
-      }
-    }
-    // Se for um encontrista (@casadepedro)
-    else if (value.startsWith("@casadepedro")) {
-      // Verificar se tem exatamente dois pontos
-      const parts = value.split(".");
-      if (parts.length !== 3) {
-        return "O usuário deve seguir o formato @casadepedro.nome.sobrenome";
-      }
-
-      // Verificar se os campos após os pontos não estão vazios
-      if (parts[1].trim() === "" || parts[2].trim() === "") {
-        return "Nome e sobrenome não podem estar vazios";
-      }
-    } else {
-      return "O usuário deve começar com @casade";
+    // Verifica se o nome e o sobrenome são iguais ao placeholder
+    const [name, surname, casa] = value.split("@")[0].split(".");
+    const placeholderName = "nome";
+    const placeholderSurname = "sobrenome";
+    if (
+      name === placeholderName ||
+      surname === placeholderSurname ||
+      casa === "casa"
+    ) {
+      return "Insira um nome, sobrenome e casa válidos.";
     }
 
     return ""; // Sem erro
@@ -126,7 +109,7 @@ export default function LoginForm() {
         <Label htmlFor="username">Usuário</Label>
         <Input
           id="username"
-          placeholder="@casadepedro.nome.sobrenome"
+          placeholder="nome.sobrenome@casa.com"
           value={username}
           onChange={handleUsernameChange}
           required
