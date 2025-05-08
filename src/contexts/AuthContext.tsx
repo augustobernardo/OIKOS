@@ -27,10 +27,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Em um caso real, isso seria uma chamada de API
 
     // Apenas para teste: Usuários predefinidos
+    // const isAdmin =
+    //   username.startsWith("@casadeoikos") && password === "admin123";
+    // const isEncontrista =
+    //   username.startsWith("@casade") && password === "encontrista123";
+
+    // admin: admin.oikos@oikos.com
+    // encontrista: maria.madalena@isabel.com
     const isAdmin =
-      username.startsWith("@casadeoikos") && password === "admin123";
+      username === "admin.oikos@oikos.com" && password === "admin123";
     const isEncontrista =
-      username.startsWith("@casade") && password === "encontrista123";
+      username === "maria.madalena@isabel.com" && password === "encontrista123";
 
     if (isAdmin || isEncontrista) {
       setIsAuthenticated(true);
