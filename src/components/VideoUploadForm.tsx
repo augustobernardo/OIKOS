@@ -9,10 +9,47 @@ export default function VideoUploadForm() {
   const [familyMemberName, setFamilyMemberName] = useState("");
   const [videoFile, setVideoFile] = useState<File | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [usernameError, setUsernameError] = useState("");
   const { toast } = useToast();
+
+  const validateUsername = (value: string) => {
+    // Regex para validar o padrão do Instagram sem iniciar com @
+    const instagramUserRegex = /^[a-zA-Z0-9._]{1,30}$/;
+
+    if (value.startsWith("@")) {
+      return "O usuário não pode iniciar com @";
+    }
+
+    if (!instagramUserRegex.test(value)) {
+      return "O usuário deve conter apenas letras, números, pontos e sublinhados, com no máximo 30 caracteres.";
+    }
+
+    return ""; // Sem erro
+  };
+
+  const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setEncontristaUsername(value);
+
+    const error = validateUsername(value);
+    setUsernameError(error);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Validar o nome de usuário antes de enviar
+    const error = validateUsername(encontristaUsername);
+    if (error) {
+      setUsernameError(error);
+      toast({
+        title: "Formato de usuário inválido",
+        description: error,
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsLoading(true);
 
     // Simulação de upload
@@ -43,15 +80,19 @@ export default function VideoUploadForm() {
         <Label htmlFor="username">Usuário do Encontrista</Label>
         <Input
           id="username"
-          placeholder="@casadepedro.nome.sobrenome"
+          placeholder="Usuário do Instagram sem @"
           value={encontristaUsername}
-          onChange={(e) => setEncontristaUsername(e.target.value)}
+          onChange={handleUsernameChange}
           required
           disabled={isLoading}
+          className={usernameError ? "border-destructive" : ""}
         />
+        {usernameError && (
+          <p className="text-sm text-destructive">{usernameError}</p>
+        )}
       </div>
 
-      <div className="space-y-2">
+      {/* <div className="space-y-2">
         <Label htmlFor="familyMember">Nome do Familiar</Label>
         <Input
           id="familyMember"
@@ -61,7 +102,7 @@ export default function VideoUploadForm() {
           required
           disabled={isLoading}
         />
-      </div>
+      </div> */}
 
       <div className="space-y-2">
         <Label htmlFor="video">Vídeo</Label>
@@ -84,7 +125,7 @@ export default function VideoUploadForm() {
       <Button
         type="submit"
         className="w-full bg-oikos-gradient hover:opacity-90 transition-opacity"
-        disabled={isLoading}
+        disabled={isLoading || !!usernameError}
       >
         {isLoading ? "Enviando..." : "Enviar Vídeo"}
       </Button>

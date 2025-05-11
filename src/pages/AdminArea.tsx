@@ -10,7 +10,7 @@ import EncontristaForm from "@/components/EncontristaForm";
 export default function AdminArea() {
   const { isAuthenticated, userRole } = useAuth();
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState("upload");
+  const [activeTab, setActiveTab] = useState("register");
 
   // Verifica se o usuário está autenticado e tem permissão
   useEffect(() => {
@@ -38,18 +38,18 @@ export default function AdminArea() {
           <div className="bg-card rounded-xl border border-border p-6 shadow">
             <Tabs value={activeTab} onValueChange={setActiveTab}>
               <TabsList className="grid w-full grid-cols-2 mb-6">
-                <TabsTrigger value="upload">Upload de Vídeo</TabsTrigger>
                 <TabsTrigger value="register">
                   Cadastro de Encontrista
                 </TabsTrigger>
+                <TabsTrigger value="upload">Upload de Vídeo</TabsTrigger>
               </TabsList>
-
-              <TabsContent value="upload" className="pt-2">
-                <VideoUploadForm />
-              </TabsContent>
 
               <TabsContent value="register" className="pt-2">
                 <EncontristaForm />
+              </TabsContent>
+
+              <TabsContent value="upload" className="pt-2">
+                <VideoUploadForm />
               </TabsContent>
             </Tabs>
           </div>

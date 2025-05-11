@@ -10,7 +10,6 @@ import {
 
 interface VideoCardProps {
   id: string;
-  title: string;
   familyMember: string;
   thumbnailUrl: string;
   videoUrl: string;
@@ -18,7 +17,6 @@ interface VideoCardProps {
 
 export default function VideoCard({
   id,
-  title,
   familyMember,
   thumbnailUrl,
   videoUrl,
@@ -32,7 +30,7 @@ export default function VideoCard({
           <div className="relative aspect-video">
             <img
               src={thumbnailUrl}
-              alt={`${familyMember} - Thumbnail`}
+              // alt={`${familyMember} - Thumbnail`}
               className="w-full h-full object-cover"
             />
             <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
@@ -46,17 +44,17 @@ export default function VideoCard({
               </svg>
             </div>
           </div>
-          <CardContent className="p-4">
+          {/* <CardContent className="p-4">
             <h3 className="font-bold text-lg truncate">{title}</h3>
             <p className="text-sm text-muted-foreground">{familyMember}</p>
-          </CardContent>
+          </CardContent> */}
         </Card>
       </DialogTrigger>
 
       <DialogContent className="sm:max-w-3xl">
-        <DialogHeader>
+        {/* <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
-        </DialogHeader>
+        </DialogHeader> */}
         <div className="video-container">
           {/* Normalmente usaríamos uma URL real de vídeo aqui */}
           <video
@@ -69,7 +67,7 @@ export default function VideoCard({
             Seu navegador não suporta o elemento de vídeo.
           </video>
         </div>
-        <p className="text-center text-lg font-medium mt-2">{familyMember}</p>
+        {/* <p className="text-center text-lg font-medium mt-2">{familyMember}</p> */}
       </DialogContent>
     </Dialog>
   );

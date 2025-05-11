@@ -16,27 +16,21 @@ export default function LoginForm() {
   const { toast } = useToast();
 
   const validateUsername = (value: string) => {
-    const casaRegex = /^([a-zA-Z]{3,})\.([a-zA-Z]{3,})@([a-zA-Z]{3,})\.com$/g;
-    if (!casaRegex.test(value)) {
-      return "O usuário deve seguir o formato: nome.sobrenome@casa.com.";
+    // Regex para validar o padrão do Instagram sem iniciar com @
+    const instagramUserRegex = /^[a-zA-Z0-9._]{1,30}$/;
+
+    if (value.startsWith("@")) {
+      return "O usuário não pode iniciar com @";
     }
 
-    // Verifica se o nome e o sobrenome são iguais ao placeholder
-    const [name, surname, casa] = value.split("@")[0].split(".");
-    const placeholderName = "nome";
-    const placeholderSurname = "sobrenome";
-    if (
-      name === placeholderName ||
-      surname === placeholderSurname ||
-      casa === "casa"
-    ) {
-      return "Insira um nome, sobrenome e casa válidos.";
+    if (!instagramUserRegex.test(value)) {
+      return "O usuário deve conter apenas letras, números, pontos e sublinhados, com no máximo 30 caracteres.";
     }
-
     return ""; // Sem erro
   };
 
   const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    e.preventDefault();
     const value = e.target.value;
     setUsername(value);
 
@@ -76,7 +70,7 @@ export default function LoginForm() {
         });
 
         // Redireciona baseado no tipo de usuário
-        if (username.startsWith("@casadeoikos")) {
+        if (username.startsWith("admin")) {
           navigate("/admin");
         } else {
           navigate("/encontrista");
@@ -109,7 +103,7 @@ export default function LoginForm() {
         <Label htmlFor="username">Usuário</Label>
         <Input
           id="username"
-          placeholder="nome.sobrenome@casa.com"
+          placeholder="Usuário do instagram sem o @"
           value={username}
           onChange={handleUsernameChange}
           required

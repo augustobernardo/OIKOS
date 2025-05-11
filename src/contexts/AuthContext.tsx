@@ -1,5 +1,12 @@
-import { createContext, useContext, useState, ReactNode } from "react";
-import supabase from "../supabase";
+import {
+  createContext,
+  useContext,
+  useState,
+  ReactNode,
+  useEffect,
+} from "react";
+import authService, { LoginCredentials, AuthResponse } from "@/api/authService";
+import { useToast } from "@/hooks/use-toast";
 
 type UserRole = "encontrista" | "admin" | null;
 
@@ -17,59 +24,91 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [userRole, setUserRole] = useState<UserRole>(null);
   const [username, setUsername] = useState<string | null>(null);
+  const { toast } = useToast();
 
-  // Simula uma API de autenticação
+  // Check if user is already authenticated on load
+  useEffect(() => {
+    const checkAuthStatus = async () => {
+      try {
+        const storedAuth = sessionStorage.getItem("auth");
+
+        if (storedAuth) {
+          const authData = JSON.parse(storedAuth);
+          setIsAuthenticated(authData.isAuthenticated);
+          setUserRole(authData.userRole as UserRole);
+          setUsername(authData.username);
+
+          // Verify with backend if token is still valid
+          const response = await authService.getCurrentUser();
+          if (!response.success) {
+            // If token is invalid, log user out
+            logout();
+          }
+        }
+      } catch (error) {
+        console.error("Error checking auth status:", error);
+        logout();
+      }
+    };
+
+    checkAuthStatus();
+  }, []);
+
   const login = async (
     username: string,
     password: string
   ): Promise<boolean> => {
-    // Simulação de verificação
-    // Em um caso real, isso seria uma chamada de API
+    try {
+      const credentials: LoginCredentials = { username, password };
+      const response = await authService.login(credentials);
 
-    // Apenas para teste: Usuários predefinidos
-    // const isAdmin =
-    //   username.startsWith("@casadeoikos") && password === "admin123";
-    // const isEncontrista =
-    //   username.startsWith("@casade") && password === "encontrista123";
+      if (response.success && response.token) {
+        setIsAuthenticated(true);
+        setUsername(username);
+        setUserRole(response.userRole as UserRole);
 
-    // admin: admin.oikos@oikos.com
-    // encontrista: maria.madalena@isabel.com
-    const isAdmin =
-      username === "admin.oikos@oikos.com" && password === "admin123";
-    const isEncontrista =
-      username === "maria.madalena@isabel.com" && password === "encontrista123";
+        // Store auth data in session storage
+        sessionStorage.setItem(
+          "auth",
+          JSON.stringify({
+            isAuthenticated: true,
+            userRole: response.userRole,
+            username,
+          })
+        );
 
-    if (isAdmin || isEncontrista) {
-      setIsAuthenticated(true);
-      setUsername(username);
-
-      if (isAdmin) {
-        setUserRole("admin");
+        return true;
       } else {
-        setUserRole("encontrista");
+        toast({
+          title: "Falha no login",
+          description: response.message || "Credenciais inválidas",
+          variant: "destructive",
+        });
+        return false;
       }
-
-      // Armazena na sessão (não em localStorage por questões de segurança)
-      sessionStorage.setItem(
-        "auth",
-        JSON.stringify({
-          isAuthenticated: true,
-          userRole: isAdmin ? "admin" : "encontrista",
-          username,
-        })
-      );
-
-      return true;
+    } catch (error) {
+      console.error("Login error:", error);
+      toast({
+        title: "Erro no login",
+        description: "Ocorreu um problema ao tentar fazer login",
+        variant: "destructive",
+      });
+      return false;
     }
-
-    return false;
   };
 
-  const logout = () => {
-    setIsAuthenticated(false);
-    setUserRole(null);
-    setUsername(null);
-    sessionStorage.removeItem("auth");
+  const logout = async () => {
+    try {
+      await authService.logout();
+    } catch (error) {
+      console.error("Logout error:", error);
+    } finally {
+      // Always clear auth state even if API call fails
+      setIsAuthenticated(false);
+      setUserRole(null);
+      setUsername(null);
+      sessionStorage.removeItem("auth");
+    }
   };
 
   return (

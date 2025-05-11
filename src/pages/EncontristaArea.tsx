@@ -83,8 +83,8 @@ export default function EncontristaArea() {
                 <VideoCard
                   key={video.id}
                   id={video.id}
-                  title={video.title}
-                  familyMember={video.familyMember}
+                  // title={video.title}
+                  // familyMember={video.familyMember}
                   thumbnailUrl={video.thumbnailUrl}
                   videoUrl={video.videoUrl}
                 />
